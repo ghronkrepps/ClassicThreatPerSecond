@@ -9,7 +9,7 @@
 <body>
     <div id="infobox">
         <span class="bold">Enter info here:</span>
-        <form id="target" action="#">
+        <form id="reportForm" action="#">
             <div>
                 <span>API Key:</span>
                 <input id="api" value="">
@@ -18,11 +18,21 @@
                 <span>Report:</span>
                 <input id="report" value="Jk7QbyVYgRx9KG83">
             </div>
-            <div>
-                <span>Char name:</span>
-                <input id="char" value="Results">
-            </div>
-            <input type="submit" value="GO">
+            <input type="submit" value="Fetch Report">
         </form>
     </div>
+
+    <div id="infobox">
+        <form id="parseForm" action="#" style="display:none;">
+            <select id="playerList">
+                
+            </select>
+            <select id="encounterList">
+                
+            </select>
+            <input type="submit" value="Parse Encounter">
+        </form>
+    </div>
+
+    <div id="results"></div>
 </body>
