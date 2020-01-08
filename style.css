@@ -1,0 +1,14 @@
+div {
+    padding: 5px;
+}
+
+#infobox {
+    background-color: gainsboro;
+    padding: 10px
+}
+
+.bold {
+    font-size: large;
+    font-weight: bold;
+}
+
