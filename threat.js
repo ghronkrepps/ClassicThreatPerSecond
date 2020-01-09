@@ -14,6 +14,11 @@ var hitTypes = {
 
 
 
+function handler_zero() {
+    return (encounter, event) => {
+        return 0;
+    }
+}
 
 function handler_changeThreatModifier(threatModifier) {
     return (encounter, event) => {
@@ -34,9 +39,18 @@ function handler_castCanMiss(threatValue) {
     }
 }
 
-function handler_threatOnHit(threatValue) {
+function handler_damage() {
     return (encounter, event) => {
-        if (event['type'] == 'damage' && event['hitType']<=4) {
+        if (event['type'] == 'damage') {
+            return event['amount'];
+        }
+        return 0;
+    }
+}
+
+function handler_threatOnHit(threatValue=0) {
+    return (encounter, event) => {
+        if (event['type'] == 'damage' && event['hitType']<=6) {
             return event['amount'] + threatValue;
         }
         return 0;
@@ -73,10 +87,18 @@ var gHandlers = {
 
 
     /* Physical */
-        1: handler_threatOnHit(0), //Melee
-     7919: handler_threatOnHit(0), //Shoot Crossbow
-     9910: handler_threatOnHit(0), //Thorns
-    16624: handler_threatOnHit(0), //Thorium Shield Spike
+        1: handler_damage(), //Melee
+     7919: handler_damage(), //Shoot Crossbow
+     9910: handler_damage(), //Thorns
+    16624: handler_damage(), //Thorium Shield Spike
+    12721: handler_damage(), //Deep Wounds
+
+    //Bloodthirst
+    23881: handler_damage(), //Rank 1
+    23892: handler_damage(), //Rank 2
+    23893: handler_damage(), //Rank 3
+    23894: handler_damage(), //Rank 4
+    23888: handler_zero(),   //Buff
 
     //Heroic Strike
        78: handler_threatOnHit(20),
@@ -95,7 +117,7 @@ var gHandlers = {
     //Revenge
     11601: handler_threatOnHit(315), //Rank 5
     25288: handler_threatOnHit(355), //Rank 6 (AQ)
-    12798: ()=>{return 0},   //Revenge Stun
+    12798: handler_zero(),           //Revenge Stun
 
     //Cleave
       845: handler_threatOnHit(10),  //Rank 1
@@ -104,12 +126,24 @@ var gHandlers = {
     11609: handler_threatOnHit(70),  //Rank 4
     20569: handler_threatOnHit(100), //Rank 5
 
+    //Whirlwind
+     1680: handler_damage(), //Whirlwind
+
     //Hamstring
     7373: handler_threatOnHit(145),
 
     //Intercept
     20252: handler_threatOnHit(0), //Intercept
-    20253: ()=>{return 0},         //Intercept Stun
+    20253: handler_zero(),         //Intercept Stun (Rank 1)
+    20616: handler_threatOnHit(0), //Intercept (Rank 2)
+    20614: handler_zero(),         //Intercept Stun (Rank 2)
+    20617: handler_threatOnHit(0), //Intercept (Rank 3)
+    20615: handler_zero(),         //Intercept Stun (Rank 3)
+
+    //Execute
+    20647: (encounter, event) => {
+        return event['amount'] + 1.2;
+    },
 
 
 
@@ -124,26 +158,54 @@ var gHandlers = {
     //Demo Shout
     11556: handler_threatOnDebuff(43),
 
+    //Mocking Blow
+    20560: handler_damage(), 
+
 
     /* Consumables */
     //Gift of Arthas
     11374: handler_threatOnDebuff(90),
 
 
+    /* Damage/Weapon Procs */
+    20007: handler_zero(),   //Heroic Strength (Crusader)
+    18138: handler_damage(), //Deathbringer (Shadow Bolt)
+
+
 
     /* Zero Threat Abilities */
-      355: ()=>{return 0}, //Taunt
-    20560: ()=>{return 0}, //Mocking Blow
-    10610: ()=>{return 0}, //Windfury Totem
-    20007: ()=>{return 0}, //Heroic Strength (Crusader)
-    17528: ()=>{return 0}, //Mighty Rage
-     2687: ()=>{return 0}, //Bloodrage (cast)
-    29131: ()=>{return 0}, //Bloodrage (buff)
-    29478: ()=>{return 0}, //Battlegear of Might
-    23602: ()=>{return 0}, //Shield Specialization
-    12964: ()=>{return 0}, //Unbridled Wrath
-    11578: ()=>{return 0}, //Charge
-     7922: ()=>{return 0}, //Charge Stun
+      355: handler_zero(), //Taunt
+    10610: handler_zero(), //Windfury Totem
+     2687: handler_zero(), //Bloodrage (cast)
+    29131: handler_zero(), //Bloodrage (buff)
+    29478: handler_zero(), //Battlegear of Might
+    23602: handler_zero(), //Shield Specialization
+    12964: handler_zero(), //Unbridled Wrath
+    11578: handler_zero(), //Charge
+     7922: handler_zero(), //Charge Stun
+    18499: handler_zero(), //Berserker Rage
+    12966: handler_zero(), //Flurry (Rank 1)
+    12967: handler_zero(), //Flurry (Rank 2)
+    12968: handler_zero(), //Flurry (Rank 3)
+    12969: handler_zero(), //Flurry (Rank 4)
+    12970: handler_zero(), //Flurry (Rank 5)
+    12328: handler_zero(), //Death Wish
+     1719: handler_zero(), //Recklessness
+    20572: handler_zero(), //Blood Fury
+    12323: handler_zero(), //Piercing Howl
+    14204: handler_zero(), //Enrage
+
+    /* Consumable Buffs */
+    17528: handler_zero(), //Mighty Rage
+    10667: handler_zero(), //Rage of Ages
+    25804: handler_zero(), //Rumsey Rum Black Label
+    17038: handler_zero(), //Winterfall Firewater
+     8220: handler_zero(), //Savory Deviate Delight (Flip Out)
+    17543: handler_zero(), //Fire Protection
+    18125: handler_zero(), //Blessed Sunfruit
+    17538: handler_zero(), //Elixir of the Mongoose
+    11359: handler_zero(), //Restorative Potion (Restoration) Buff
+    23396: handler_zero(), //Restorative Potion (Restoration) Dispell
 }
 
 
