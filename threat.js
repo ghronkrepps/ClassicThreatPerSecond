@@ -142,7 +142,7 @@ var gHandlers = {
 
     //Execute
     20647: (encounter, event) => {
-        return event['amount'] + 1.2;
+        return event['amount'] * 1.2;
     },
 
 
