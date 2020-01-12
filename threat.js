@@ -89,9 +89,10 @@ var gHandlers = {
     /* Physical */
         1: handler_damage(), //Melee
      7919: handler_damage(), //Shoot Crossbow
-     9910: handler_damage(), //Thorns
     16624: handler_damage(), //Thorium Shield Spike
     12721: handler_damage(), //Deep Wounds
+     6552: handler_damage(), //Pummel (Rank 1) (TODO: Did this interrupt)
+     6554: handler_damage(), //Pummel (Rank 2) (TODO: Did this interrupt)
 
     //Bloodthirst
     23881: handler_damage(), //Rank 1
@@ -99,6 +100,7 @@ var gHandlers = {
     23893: handler_damage(), //Rank 3
     23894: handler_damage(), //Rank 4
     23888: handler_zero(),   //Buff
+    23885: handler_zero(),   //Buff
 
     //Heroic Strike
        78: handler_threatOnHit(20),
@@ -171,10 +173,20 @@ var gHandlers = {
     20007: handler_zero(),   //Heroic Strength (Crusader)
     18138: handler_damage(), //Deathbringer (Shadow Bolt)
 
+    /* Thorn Effects */
+    9910: handler_damage(),  //Thorns (Rank 6)
+    17275: handler_damage(), //Heart of the Scale
+    22600: handler_damage(), //Force Reactive 
+    11350: handler_zero(),   //Oil of Immolation (buff)
+    11351: handler_damage(), //Oil of Immolation (dmg)
+
+    /* Explosives */
+    13241: handler_damage(), //Goblin Sapper Charge
 
 
     /* Zero Threat Abilities */
       355: handler_zero(), //Taunt
+     1161: handler_zero(), //Challenging Shout
     10610: handler_zero(), //Windfury Totem
      2687: handler_zero(), //Bloodrage (cast)
     29131: handler_zero(), //Bloodrage (buff)
@@ -194,14 +206,23 @@ var gHandlers = {
     20572: handler_zero(), //Blood Fury
     12323: handler_zero(), //Piercing Howl
     14204: handler_zero(), //Enrage
+    12975: handler_zero(), //Last Stand (cast)
+    12976: handler_zero(), //Last Stand (buff)
+     2565: handler_zero(), //Shield Block
+    26296: handler_zero(), //Berserking (Troll racial)
+    26635: handler_zero(), //Berserking (Troll racial)
+    22850: handler_zero(), //Sanctuary
+     9515: handler_zero(), //Summon Tracking Hound
 
-    /* Consumable Buffs */
-    17528: handler_zero(), //Mighty Rage
+    /* Consumable Buffs (zero-threat) */
+     6613: handler_zero(), //Great Rage Potion
+    17528: handler_zero(), //Mighty Rage Potion
     10667: handler_zero(), //Rage of Ages
     25804: handler_zero(), //Rumsey Rum Black Label
     17038: handler_zero(), //Winterfall Firewater
      8220: handler_zero(), //Savory Deviate Delight (Flip Out)
     17543: handler_zero(), //Fire Protection
+    17548: handler_zero(), //Greater Shadow Protection Potion
     18125: handler_zero(), //Blessed Sunfruit
     17538: handler_zero(), //Elixir of the Mongoose
     11359: handler_zero(), //Restorative Potion (Restoration) Buff
@@ -268,11 +289,11 @@ function identify_start_stance(events) {
 
 
 function newParse(reportCode, callback) {
-    $.get(`https://classic.warcraftlogs.com:443/v1/report/fights/${reportCode}?translate=true&api_key=${gAPIKey}`, function(data) {
-        if (data['status']) {
-            throw data['error'];
-        }
+    $.get(`https://classic.warcraftlogs.com:443/v1/report/fights/${reportCode}?translate=true&api_key=${gAPIKey}`, (data) => {
         callback(new Parse(reportCode, data));
+    }).fail((error) => {
+        callback(undefined);
+        alert(error.responseJSON.error);
     });
 }
 class Parse {
@@ -295,7 +316,6 @@ class Parse {
     getFriendlyEncounters(playerId) {
         let player = this.friendlies.find(p => p.id == playerId);
         let playerFights = player.fights.map(e => e.id);
-        console.log(playerFights);
         return this.encounters.filter(e => playerFights.includes(e.id));
     }
 
@@ -316,11 +336,16 @@ class Encounter {
         this.stop = fight['end_time'];
         this.name = fight['name'];
         this.time = (this.stop - this.start) / 1000;
+
+        this.playerID = -1;
     }
 
     // Adding a method to the constructor
     parse(playerID, callback) {
+        if (this.playerID == playerID)
+            return callback(this);
         this.playerID = playerID;
+
         fetch_events(playerID, this.reportCode, this.encounterID, (events) => {
             this.events = events;
             this.calculate();
@@ -382,27 +407,45 @@ class Encounter {
     }
 }
 
+class Enemy {
+    constructor(enemyID, encounterID) {
+        this.id = enemyID;
+        this.players = [];
+    }
+
+    addThreat(playerID, threat) {
+        let player = this.players[playerID] || {threat:0};
+
+        player.threat += threat;
+
+        this.players[playerID] = player;
+    }
+}
 
 
 $( document ).ready(function() {
-    console.log("threat.js");
-
     $("#reportForm").submit((event) => {
-        console.log("clicked");
         gAPIKey = $("#api").val();
-        let gReportCode = $("#report").val();
-        console.log(gAPIKey, gReportCode);
+        let reportURL = $("#report").val();
+        console.log(gAPIKey, reportURL);
 
-        if (!gAPIKey || !gReportCode) {
+        if (!gAPIKey || !reportURL) {
             alert("Fill in the damn form");
         } else {
-            newParse(gReportCode, (p) => {
+            let reportID = reportURL;
+            try {
+                reportID = /^https?:\/\/classic\.warcraftlogs\.com\/reports\/(.*?)(#.*)?$/.exec(reportURL)[1];
+            } catch (error) {}
+
+            $("#results").empty();
+            $('#parseForm').hide();
+            $("#reportForm > input[type='submit']").attr("disabled", true);
+            newParse(reportID, (p) => {
+                $("#reportForm > input[type='submit']").removeAttr("disabled");
+                if (!p) {return};
                 gParse = p;
 
-                console.log(p);
-                for (boss of p.encounters) {
-                    console.log(boss['name'], (boss['end_time'] - boss['start_time']) / 1000);
-                }
+                $("#parseTitle").text(gParse.title);
 
                 let pList = $('#playerList');
                 pList.empty();
@@ -412,7 +455,6 @@ $( document ).ready(function() {
                             value: player.id,
                             text: player.name,
                         }));
-                        console.log(player.id, player.name);
                     }
                 }
                 pList.trigger('change');
@@ -428,18 +470,24 @@ $( document ).ready(function() {
         let selected = $(this).find("option:selected");
         let playerId = selected.val();
         let playerName = selected.text();
-        console.log(playerId, playerName);
+
+
+        let savedEncounterID = $('#encounterList option:selected').val();
 
         let encounters = gParse.getFriendlyEncounters(playerId);
-        console.log(encounters);
-        let eList = $('#encounterList');
-        eList.empty();
+        let eList = $('#encounterList').empty();
         for (boss of encounters) {
             eList.append($('<option>', {
                 value: boss.encounterID,
                 text: `${boss.name} (${boss.time.toFixed(2)})`,
             }));
         }
+
+        let reselectEncounter = $(this).find(`option[value=${savedEncounterID}]`)
+        if (reselectEncounter) {
+            reselectEncounter.attr('selected','selected');
+        }
+
         eList.trigger('change');
     });
 
@@ -449,13 +497,11 @@ $( document ).ready(function() {
 
         let encounter = gParse.getEncounter(encounterID);
         encounter.parse(playerID, (e) => {
-            console.log("Total threat: " + e.threat);
-            console.log("TPS: " + (e.threat / e.time));
-
             let playerName = $('#playerList option:selected').text();
-            $("#results").append($('<h1>', {text: `${playerName} - ${e.name} (${e.time.toFixed(2)})`}));
-            $("#results").append($('<div>', {text: `Total threat: ${e.threat.toFixed(0)}`}));
-            $("#results").append($('<div>', {text: `TPS: ${(e.threat / e.time).toFixed(2)}`}));
+            let results = $("#results").empty();
+            results.append($('<h1>', {text: `${playerName} - ${e.name} (${e.time.toFixed(2)})`}));
+            results.append($('<div>', {text: `Total threat: ${e.threat.toFixed(0)}`}));
+            results.append($('<div>', {text: `TPS: ${(e.threat / e.time).toFixed(2)}`}));
         });
 
         event.preventDefault();

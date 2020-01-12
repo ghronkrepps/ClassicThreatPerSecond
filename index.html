@@ -8,15 +8,14 @@
 </head>
 <body>
     <div id="infobox">
-        <span class="bold">Enter info here:</span>
         <form id="reportForm" action="#">
             <div>
-                <span>API Key:</span>
+                <span><a href="https://classic.warcraftlogs.com/profile">WCL API Key</a>:</span>
                 <input id="api" value="">
             </div>
             <div>
-                <span>Report:</span>
-                <input id="report" value="">
+                <span>Report url:</span>
+                <input id="report" placeholder="https://classic.warcraftlogs.com/reports/..." value="">
             </div>
             <input type="submit" value="Fetch Report">
         </form>
@@ -24,13 +23,15 @@
 
     <div id="infobox">
         <form id="parseForm" action="#" style="display:none;">
+            <h1 id="parseTitle"></h1>
             <select id="playerList">
                 
             </select>
             <select id="encounterList">
                 
             </select>
-            <input type="submit" value="Parse Encounter">
+            <br>
+            <input type="submit" value="Calculate TPS">
         </form>
     </div>
 
