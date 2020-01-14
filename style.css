@@ -22,7 +22,7 @@ select {
     font-size: large;
 }
 
-#infobox {
+.infobox {
     background-color: gainsboro;
     padding: 10px;
     margin: auto;
@@ -33,3 +33,27 @@ select {
     font-size: large;
     font-weight: bold;
 }
+
+#tabs {
+    display: none;
+}
+
+TBODY TR TD {
+    min-width: 50px;
+}
+
+TBODY TR TD:nth-child(1) {
+    min-width: 150px;
+}
+
+TBODY TR TD:nth-child(2),
+TBODY TR TD:nth-child(3) {
+    text-align: center;
+}
+
+TBODY TR TD:nth-child(4),
+TBODY TR TD:nth-child(5)
+{
+    text-align: right;
+}
+
