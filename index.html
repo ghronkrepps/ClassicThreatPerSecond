@@ -4,10 +4,11 @@
     <link href="style.css" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="threat.js"></script>
 </head>
 <body>
-    <div id="infobox">
+    <div class="infobox">
         <form id="reportForm" action="#">
             <div>
                 <span><a href="https://classic.warcraftlogs.com/profile">WCL API Key</a>:</span>
@@ -21,7 +22,7 @@
         </form>
     </div>
 
-    <div id="infobox">
+    <div class="infobox">
         <form id="parseForm" action="#" style="display:none;">
             <h1 id="parseTitle"></h1>
             <select id="playerList">
@@ -36,4 +37,5 @@
     </div>
 
     <div id="results"></div>
+    <div id="table"></div>
 </body>
