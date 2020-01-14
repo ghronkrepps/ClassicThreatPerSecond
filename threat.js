@@ -29,7 +29,7 @@ function handler_changeThreatModifier(threatModifier, name) {
 
 function handler_castCanMiss(threatValue, name) {
     return (encounter, event) => {
-        switch (event['type']) {
+        switch (event.type) {
             case 'cast':
                 return [threatValue, name];
             case 'damage':
@@ -41,7 +41,7 @@ function handler_castCanMiss(threatValue, name) {
 
 function handler_damage(name) {
     return (encounter, event) => {
-        if (event['type'] == 'damage') {
+        if (event.type == 'damage') {
             return [event['amount'], name];
         }
         return [0, name];
@@ -50,7 +50,7 @@ function handler_damage(name) {
 
 function handler_threatOnHit(threatValue=0, name) {
     return (encounter, event) => {
-        if (event['type'] == 'damage' && event['hitType']<=6) {
+        if (event.type == 'damage' && event['hitType']<=6) {
             return [event['amount'] + threatValue, name];
         }
         return [0, name];
@@ -59,7 +59,7 @@ function handler_threatOnHit(threatValue=0, name) {
 
 function handler_threatOnDebuff(threatValue, name) {
     return (encounter, event) => {
-        switch (event['type']) {
+        switch (event.type) {
             case 'applydebuff':
             case 'refreshdebuff':
                 return [threatValue, name];
@@ -70,7 +70,7 @@ function handler_threatOnDebuff(threatValue, name) {
 
 function handler_threatOnBuff(threatValue, name) {
     return (encounter, event) => {
-        switch (event['type']) {
+        switch (event.type) {
             case 'applybuff':
             case 'refreshbuff':
                 return [threatValue, name];
@@ -253,7 +253,7 @@ function fetch_events(playerID, reportCode, encounterID, callback, events=[], st
 
 function identify_start_stance(events) {
     for (let event of events) {
-        if (event['type'] == 'cast') {
+        if (event.type == 'cast') {
             switch (event['ability']['name']) {
                 case 'Revenge':
                 case 'Shield Slam':
@@ -278,7 +278,7 @@ function identify_start_stance(events) {
                 case 'Berserker Stance':
                     return 'Unknown'
             }
-        } else if (event['type'] == 'removebuff') {
+        } else if (event.type == 'removebuff') {
             if (event['ability']['name'].includes(' Stance')) {
                 return event['ability']['name'];
             }
@@ -385,7 +385,7 @@ class Encounter {
 
             let t = 0;
             let event_name = "";
-            switch (event['type']) {
+            switch (event.type) {
                 case 'combatantinfo': //TODO: Retrieve gear
                 case 'extraattacks':
                     break;
@@ -397,6 +397,7 @@ class Encounter {
                     t = event.resourceChange * 5;
                     event_name = "Rage Gains";
                     break;
+                case 'cast':
                 default:
                     let f = gHandlers[event.ability.guid];
                     if (f == undefined) {
@@ -407,25 +408,15 @@ class Encounter {
                     t = threat_info[0];
                     event_name = threat_info[1];
 
-                    if (event['type'] === 'cast') {
-                        let cast_entry = this.cast_count[event_name];
-                        if (cast_entry === undefined) {
-                            this.cast_count[event_name] = 1;
-                        } else {
-                            this.cast_count[event_name]++;
-                        }
+                    if (event.type == 'cast') {
+                        this.cast_count[event_name] = (this.cast_count[event_name]||0)+1;
                     }
             }
             // console.log(this.threat, t, event);
             this.threat += (t * this.threatModifier);
 
-            if (t > 0) {
-                let breakdown_entry = this.breakdown[event_name];
-                if (breakdown_entry === undefined) {
-                    this.breakdown[event_name] = t;
-                } else {
-                    this.breakdown[event_name] += t;
-                }
+            if (t) {
+                this.breakdown[event_name] = (this.breakdown[event_name]||0)+t;
             }
         }
     }
