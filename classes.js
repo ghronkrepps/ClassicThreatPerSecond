@@ -197,7 +197,7 @@ class Warrior extends Player {
      
         //Execute
         20647: (encounter, event) => {
-            return [event['amount'] * 1.2, "Execute"];
+            return [event['amount'] * 1.25, "Execute"];
         },
      
         /* Abilities */
