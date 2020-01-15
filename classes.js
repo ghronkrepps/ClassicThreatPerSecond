@@ -167,6 +167,9 @@ class Warrior extends Player {
         25286: handler_threatOnHit(175, "Heroic Strike"), // (AQ)
      
         //Shield Slam
+        23922: handler_threatOnHit(166, "Shield Slam (Rank 1)"), //Rank 1
+        23923: handler_threatOnHit(200, "Shield Slam (Rank 2)"), //Rank 2
+        23924: handler_threatOnHit(225, "Shield Slam (Rank 3)"), //Rank 3
         23925: handler_threatOnHit(250, "Shield Slam"), //Rank 4
      
         //Revenge
