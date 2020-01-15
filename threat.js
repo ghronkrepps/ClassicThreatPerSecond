@@ -137,10 +137,11 @@ class Encounter {
                     }
             }
             // console.log(this.threat, t, event);
-            this.threat += (t * this.player.threatModifier);
+            let adjusted_threat = t * this.player.threatModifier;
+            this.threat += adjusted_threat;
 
             if (t) {
-                this.breakdown[event_name] = (this.breakdown[event_name]||0)+t;
+                this.breakdown[event_name] = (this.breakdown[event_name]||0)+adjusted_threat;
             }
         }
     }
