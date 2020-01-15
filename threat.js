@@ -212,6 +212,7 @@ var gHandlers = {
     26635: handler_zero("Berserking (Troll racial)"), //Berserking (Troll racial)
     22850: handler_zero("Sanctuary"), //Sanctuary
      9515: handler_zero("Summon Tracking Hound"), //Summon Tracking Hound
+      871: handler_zero("Shield Wall"),
 
     /* Consumable Buffs (zero-threat) */
      6613: handler_zero("Great Rage Potion"), //Great Rage Potion
@@ -229,32 +230,11 @@ var gHandlers = {
 }
 
 
-function fetch_events(playerID, reportCode, encounterID, callback, events=[], startTimestamp=0) {
-    $.get(`https://classic.warcraftlogs.com/v1/report/events/summary/${reportCode}?`+$.param({
-        view: 'summary',
-        sourceid: playerID,
-        start: startTimestamp,
-        end: 9999999999999,
-        encounter: encounterID,
-        translate: true,
-        api_key: gAPIKey,
-    }), (data) => {
-        // TODO: Verify data before concat (check last and first events?)
-        events.push(...data['events']);
-        let nextPageTimestamp = data['nextPageTimestamp'];
-        if (nextPageTimestamp) {
-            fetch_events(playerID, reportCode, encounterID, callback, events, nextPageTimestamp);
-        } else {
-            callback(events);
-        }
-    });
-}
-
 
 function identify_start_stance(events) {
     for (let event of events) {
         if (event.type == 'cast') {
-            switch (event['ability']['name']) {
+            switch (event.ability.name) {
                 case 'Revenge':
                 case 'Shield Slam':
                 case 'Disarm':
@@ -273,17 +253,19 @@ function identify_start_stance(events) {
                 case 'Retaliation':
                 case 'Thunder Clap':
                     return 'Battle Stance';
-                case 'Defensive Stance':
-                case 'Battle Stance':
-                case 'Berserker Stance':
-                    return 'Unknown'
             }
         } else if (event.type == 'removebuff') {
-            if (event['ability']['name'].includes(' Stance')) {
-                return event['ability']['name'];
+            switch (event.ability.guid) {
+                case 71:
+                    return 'Defensive Stance';
+                case 2457:
+                    return 'Battle Stance';
+                case 2458:
+                    return 'Berserker Stance';
             }
         }
     }
+    return 'Unknown'
 }
 
 
@@ -318,8 +300,8 @@ class Parse {
         return this.encounters.filter(e => playerFights.includes(e.id));
     }
 
-    getEncounter(encounterID) {
-        return this.encounters.find(e => e.encounterID == encounterID);
+    getEncounter(id) {
+        return this.encounters.find(e => e.id == id);
     }
 }
 
@@ -336,6 +318,7 @@ class Encounter {
         this.name = fight['name'];
         this.time = (this.stop - this.start) / 1000;
 
+        this.events = [];
         this.playerID = -1;
     }
 
@@ -345,17 +328,36 @@ class Encounter {
             return callback(this);
         this.playerID = playerID;
 
-        fetch_events(playerID, this.reportCode, this.encounterID, (events) => {
-            this.events = events;
+        this.fetch_events(() => {
             this.calculate();
             callback(this);
+        });
+    }
+
+    fetch_events(callback, startTimestamp=this.start) {
+        $.get(`https://classic.warcraftlogs.com/v1/report/events/summary/${this.reportCode}?`+$.param({
+            view: 'summary',
+            sourceid: this.playerID,
+            start: startTimestamp,
+            end: this.stop,
+            encounter: this.encounterID,
+            translate: true,
+            api_key: gAPIKey,
+        }), (data) => {
+            this.events.push(...data['events']);
+            let nextPageTimestamp = data['nextPageTimestamp'];
+            if (nextPageTimestamp) {
+                this.fetch_events(callback, nextPageTimestamp);
+            } else {
+                callback();
+            }
         });
     }
 
     calculate() {
         // console.log(this.events, this.events.length);
         console.log("--------------------------------------------")
-        console.log(`Beginning calculation of ${this._fight.name}`);
+        console.log(`Beginning calculation of ${this._fight.name} (${this.time})`);
 
         // Identify the stance we start in based on ability usage
         let startStance = identify_start_stance(this.events);
@@ -364,11 +366,11 @@ class Encounter {
             case 'Defensive Stance':
                 gHandlers[71](this);
                 break;
-            case 'Berserker Stance':
-                gHandlers[2458](this);
-                break;
             case 'Battle Stance':
                 gHandlers[2457](this);
+                break;
+            case 'Berserker Stance':
+                gHandlers[2458](this);
                 break;
             default:
                 throw "Failed to identify starting stance";
@@ -390,11 +392,13 @@ class Encounter {
                 case 'extraattacks':
                     break;
                 case 'heal':
-                    t = event.amount / 2;
+                    // Amount healed always in event.amount, overhealing in event.overheal
+                    t = event.amount / 2.0;
                     event_name = "Heal";
                     break;
                 case 'energize':
-                    t = event.resourceChange * 5;
+                    // resourceChange is always the full amount, have to subtract event.waste
+                    t = (event.resourceChange - event.waste) * 5.0;
                     event_name = "Rage Gains";
                     break;
                 case 'cast':
@@ -423,7 +427,7 @@ class Encounter {
 }
 
 class Enemy {
-    constructor(enemyID, encounterID) {
+    constructor(enemyID, fightID) {
         this.id = enemyID;
         this.players = [];
     }
@@ -452,6 +456,7 @@ $( document ).ready(function() {
                 reportID = /^https?:\/\/classic\.warcraftlogs\.com\/reports\/(.*?)(#.*)?$/.exec(reportURL)[1];
             } catch (error) {}
 
+            $("#table").empty();
             $("#results").empty();
             $('#parseForm').hide();
             $("#reportForm > input[type='submit']").attr("disabled", true);
@@ -487,18 +492,18 @@ $( document ).ready(function() {
         let playerName = selected.text();
 
 
-        let savedEncounterID = $('#encounterList option:selected').val();
+        let savedFightID = $('#encounterList option:selected').val();
 
         let encounters = gParse.getFriendlyEncounters(playerId);
         let eList = $('#encounterList').empty();
         for (boss of encounters) {
             eList.append($('<option>', {
-                value: boss.encounterID,
+                value: boss.id,
                 text: `${boss.name} (${boss.time.toFixed(2)})`,
             }));
         }
 
-        let reselectEncounter = $(this).find(`option[value=${savedEncounterID}]`)
+        let reselectEncounter = $(this).find(`option[value=${savedFightID}]`)
         if (reselectEncounter) {
             reselectEncounter.attr('selected','selected');
         }
