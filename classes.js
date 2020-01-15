@@ -85,7 +85,6 @@ class Player {
     
 
         /* Consumables */
-        //Gift of Arthas
         11374: handler_threatOnDebuff(90, "Gift of Arthas"),
     
     
@@ -105,39 +104,14 @@ class Player {
     
     
         /* Zero Threat Abilities */
-          355: handler_zero("Taunt"), //Taunt
-         1161: handler_zero("Challenging Shout"), //Challenging Shout
         10610: handler_zero("Windfury Totem"), //Windfury Totem
-         2687: handler_zero("Bloodrage"), //Bloodrage (cast)
-        29131: handler_zero("Bloodrage"), //Bloodrage (buff)
-        29478: handler_zero("Battlegear of Might"), //Battlegear of Might
-        23602: handler_zero("Shield Specialization"), //Shield Specialization
-        12964: handler_zero("Unbridled Wrath"), //Unbridled Wrath
-        11578: handler_zero("Charge"), //Charge
-         7922: handler_zero("Charge Stun"), //Charge Stun
-        18499: handler_zero("Berserker Rage"), //Berserker Rage
-        12966: handler_zero("Flurry (Rank 1)"), //Flurry (Rank 1)
-        12967: handler_zero("Flurry (Rank 2)"), //Flurry (Rank 2)
-        12968: handler_zero("Flurry (Rank 3)"), //Flurry (Rank 3)
-        12969: handler_zero("Flurry (Rank 4)"), //Flurry (Rank 4)
-        12970: handler_zero("Flurry (Rank 5)"), //Flurry (Rank 5)
-        12328: handler_zero("Death Wish"), //Death Wish
-         1719: handler_zero("Recklessness"), //Recklessness
         20572: handler_zero("Blood Fury"), //Blood Fury
-        12323: handler_zero("Piercing Howl"), //Piercing Howl
-        14204: handler_zero("Enrage"), //Enrage
-        12975: handler_zero("Last Stand (cast)"), //Last Stand (cast)
-        12976: handler_zero("Last Stand (buff)"), //Last Stand (buff)
-         2565: handler_zero("Shield Block"), //Shield Block
         26296: handler_zero("Berserking (Troll racial)"), //Berserking (Troll racial)
         26635: handler_zero("Berserking (Troll racial)"), //Berserking (Troll racial)
         22850: handler_zero("Sanctuary"), //Sanctuary
          9515: handler_zero("Summon Tracking Hound"), //Summon Tracking Hound
-          871: handler_zero("Shield Wall"),
     
         /* Consumable Buffs (zero-threat) */
-         6613: handler_zero("Great Rage Potion"), //Great Rage Potion
-        17528: handler_zero("Mighty Rage Potion"), //Mighty Rage Potion
         10667: handler_zero("Rage of Ages"), //Rage of Ages
         25804: handler_zero("Rumsey Rum Black Label"), //Rumsey Rum Black Label
         17038: handler_zero("Winterfall Firewater"), //Winterfall Firewater
@@ -151,8 +125,7 @@ class Player {
     }
 
     constructor(events) {
-        // Do any initial setup here for your classes
-        this.threatModifier = 0.0;
+        throw "This should be overridden"
     }
 
     spell(id) {
@@ -240,12 +213,42 @@ class Warrior extends Player {
      
         //Mocking Blow
         20560: handler_damage("Mocking Blow"),
+
+
+
+        /* Zero threat abilities */
+         355: handler_zero("Taunt"), //Taunt
+        1161: handler_zero("Challenging Shout"), //Challenging Shout
+        2687: handler_zero("Bloodrage"), //Bloodrage (cast)
+       29131: handler_zero("Bloodrage"), //Bloodrage (buff)
+       29478: handler_zero("Battlegear of Might"), //Battlegear of Might
+       23602: handler_zero("Shield Specialization"), //Shield Specialization
+       12964: handler_zero("Unbridled Wrath"), //Unbridled Wrath
+       11578: handler_zero("Charge"), //Charge
+        7922: handler_zero("Charge Stun"), //Charge Stun
+       18499: handler_zero("Berserker Rage"), //Berserker Rage
+       12966: handler_zero("Flurry (Rank 1)"), //Flurry (Rank 1)
+       12967: handler_zero("Flurry (Rank 2)"), //Flurry (Rank 2)
+       12968: handler_zero("Flurry (Rank 3)"), //Flurry (Rank 3)
+       12969: handler_zero("Flurry (Rank 4)"), //Flurry (Rank 4)
+       12970: handler_zero("Flurry (Rank 5)"), //Flurry (Rank 5)
+       12328: handler_zero("Death Wish"), //Death Wish
+         871: handler_zero("Shield Wall"),
+        1719: handler_zero("Recklessness"), //Recklessness
+       12323: handler_zero("Piercing Howl"), //Piercing Howl
+       14204: handler_zero("Enrage"), //Enrage
+       12975: handler_zero("Last Stand (cast)"), //Last Stand (cast)
+       12976: handler_zero("Last Stand (buff)"), //Last Stand (buff)
+        2565: handler_zero("Shield Block"), //Shield Block
+
+
+        /* Consumable */
+         6613: handler_zero("Great Rage Potion"), //Great Rage Potion
+        17528: handler_zero("Mighty Rage Potion"), //Mighty Rage Potion
     } 
 
     constructor(events) {
-        super(events);
-
-        // Identify the stance we start in based on ability usage
+        // Identify the starting stance based on ability usage
         let startStance = this.identify_start_stance(events);
         switch (startStance) {
             case 'Defensive Stance':
