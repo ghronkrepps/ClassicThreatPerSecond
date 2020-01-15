@@ -125,7 +125,7 @@ class Player {
     }
 
     constructor(events) {
-        throw "This should be overridden"
+        this.threatModifier = 0.0;
     }
 
     spell(id) {
@@ -248,6 +248,8 @@ class Warrior extends Player {
     } 
 
     constructor(events) {
+        super(events);
+
         // Identify the starting stance based on ability usage
         let startStance = this.identify_start_stance(events);
         switch (startStance) {
