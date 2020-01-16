@@ -54,19 +54,22 @@ class Encounter {
         this.time = (this.stop - this.start) / 1000;
 
         this.events = [];
-        this.playerID = -1;
+        this.playerIDs = [];
     }
 
     // Adding a method to the constructor
     parse(playerID, callback) {
-        if (playerID == this.playerID)
-            return callback(this);
         this.playerID = playerID;
-
-        this.fetch_events(() => {
+        if (this.playerIDs.includes(playerID)) {
             this.calculate();
             callback(this);
-        });
+        } else {
+            this.playerIDs.push(playerID);
+            this.fetch_events(() => {
+                this.calculate();
+                callback(this);
+            });
+        }
     }
 
     fetch_events(callback, startTimestamp=this.start) {
