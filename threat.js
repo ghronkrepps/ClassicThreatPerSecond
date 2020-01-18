@@ -94,7 +94,7 @@ class Encounter {
 
     calculate() {
         let p = gParse.getPlayer(this.playerID);
-        this.player = new gClasses[p.type](this.events);
+        this.player = new gClasses[p.type](this.playerID, this.events);
 
         // console.log(this.events, this.events.length);
         console.log("--------------------------------------------")
