@@ -136,7 +136,8 @@ class Player {
         23396: handler_zero("Restorative Potion (Restoration) Dispel"), //Restorative Potion (Restoration) Dispel
     }
 
-    constructor(events) {
+    constructor(playerID, events) {
+        this.id = playerID;
         this.threatModifier = 0.0;
     }
 
@@ -260,8 +261,8 @@ class Warrior extends Player {
         17528: handler_zero("Mighty Rage Potion"), //Mighty Rage Potion
     } 
 
-    constructor(events) {
-        super(events);
+    constructor(playerID, events) {
+        super(playerID, events);
 
         // Identify the starting stance based on ability usage
         let startStance = this.identify_start_stance(events);
@@ -283,6 +284,8 @@ class Warrior extends Player {
 
     identify_start_stance(events) {
         for (let event of events) {
+            if (event.sourceID != this.id)
+                continue;
             if (event.type == 'cast') {
                 switch (event.ability.name) {
                     case 'Revenge':
@@ -380,12 +383,12 @@ class Druid extends Player {
         13494: handler_zero("Manual Crowd Pummeler"),
     } 
 
-    constructor(events) {
-        super(events);
+    constructor(playerID, events) {
+        super(playerID, events);
 
-        // Identify the starting stance based on ability usage
-        let startStance = this.identify_start_stance(events);
-        switch (startStance) {
+        // Identify the starting form based on ability usage
+        let startForm = this.identify_start_form(events);
+        switch (startForm) {
             case 'Bear Form':
                 this.spell(9634)(this);
                 break;
@@ -396,11 +399,13 @@ class Druid extends Player {
                 this.threatModifier = 1.0;
                 break;
         }
-        console.log(`Identified starting stance as '${startStance}' using modifier ${this.threatModifier}`);
+        console.log(`Identified starting form as '${startForm}' using modifier ${this.threatModifier}`);
     }
 
-    identify_start_stance(events) {
+    identify_start_form(events) {
         for (let event of events) {
+            if (event.sourceID != this.id)
+                continue;
             if (event.type == 'cast') {
                 switch (event.ability.name) {
                     case 'Maul':
