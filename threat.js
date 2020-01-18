@@ -135,6 +135,10 @@ class Encounter {
                             continue;
                     }
                     break;
+                case 'damage':
+                    // Ignore self damage (e.g. sappers)
+                    if (event.targetID == this.playerID)
+                        continue;
                 case 'cast':
                 default:
                     let f = this.player.spell(event.ability.guid);
