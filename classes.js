@@ -330,22 +330,28 @@ class Druid extends Player {
         768: handler_changeThreatModifier(0.71, "Cat Form"),
 
         /* Bear */
-        6807: handler_modDamage(1.75, "Maul (Rank 1)"),
-        6808: handler_modDamage(1.75, "Maul (Rank 2)"),
-        6809: handler_modDamage(1.75, "Maul (Rank 3)"),
-        8972: handler_modDamage(1.75, "Maul (Rank 4)"),
-        9745: handler_modDamage(1.75, "Maul (Rank 5)"),
-        9880: handler_modDamage(1.75, "Maul (Rank 6)"),
-        9881: handler_modDamage(1.75, "Maul"),
+         6807: handler_modDamage(1.75, "Maul (Rank 1)"),
+         6808: handler_modDamage(1.75, "Maul (Rank 2)"),
+         6809: handler_modDamage(1.75, "Maul (Rank 3)"),
+         8972: handler_modDamage(1.75, "Maul (Rank 4)"),
+         9745: handler_modDamage(1.75, "Maul (Rank 5)"),
+         9880: handler_modDamage(1.75, "Maul (Rank 6)"),
+         9881: handler_modDamage(1.75, "Maul"),
 
-         779: handler_modDamage(1.75, "Swipe (Rank 1)"),
-         780: handler_modDamage(1.75, "Swipe (Rank 2)"),
-         769: handler_modDamage(1.75, "Swipe (Rank 3)"),
-        9754: handler_modDamage(1.75, "Swipe (Rank 4)"),
-        9908: handler_modDamage(1.75, "Swipe"),
+          779: handler_modDamage(1.75, "Swipe (Rank 1)"),
+          780: handler_modDamage(1.75, "Swipe (Rank 2)"),
+          769: handler_modDamage(1.75, "Swipe (Rank 3)"),
+         9754: handler_modDamage(1.75, "Swipe (Rank 4)"),
+         9908: handler_modDamage(1.75, "Swipe"),
 
-        6795: handler_zero("Growl"),
-        5229: handler_zero("Enrage"),
+           99: handler_threatOnDebuff(9, "Demoralizing Roar (Rank 1)"),
+         1735: handler_threatOnDebuff(15, "Demoralizing Roar (Rank 2)"),
+         9490: handler_threatOnDebuff(20, "Demoralizing Roar (Rank 3)"),
+         9747: handler_threatOnDebuff(30, "Demoralizing Roar (Rank 4)"),
+         9898: handler_threatOnDebuff(39, "Demoralizing Roar"),
+
+         6795: handler_zero("Growl"),
+         5229: handler_zero("Enrage"),
         17057: handler_zero("Furor"),
 
          8983: handler_zero("Bash"), //TODO test bash threat
