@@ -98,9 +98,11 @@ class Player {
     
     
         /* Damage/Weapon Procs */
-        20007: handler_zero("Heroic Strength (Crusader)"),   //Heroic Strength (Crusader)
-        18138: handler_damage("Shadow Bolt (Deathbringer Proc)"), //Deathbringer (Shadow Bolt)
+        20007: handler_zero("Heroic Strength (Crusader)"),
+        18138: handler_damage("Shadow Bolt (Deathbringer Proc)"),
         24388: handler_damage("Brain Damage (Lobotomizer Proc)"),
+        23267: handler_damage("Firebolt (Perdition's Proc)"),
+        18833: handler_damage("Firebolt (Alcor's Proc)"),
 
         /* Thorn Effects */
         9910: handler_damage("Thorns"),  //Thorns (Rank 6)
