@@ -121,8 +121,19 @@ class Encounter {
                     break;
                 case 'energize':
                     // resourceChange is always the full amount, have to subtract event.waste
-                    t = (event.resourceChange - event.waste) * 5.0;
-                    event_name = "Rage Gains";
+                    switch (event.resourceChangeType) {
+                        case 0:
+                            t = (event.resourceChange - event.waste) / 2.0;
+                            event_name = "Mana Gains";
+                            break;
+                        case 1:
+                            t = (event.resourceChange - event.waste) * 5.0;
+                            event_name = "Rage Gains";
+                            break;
+                        default:
+                            console.log(`Unhandled resource gain [${event.resourceChangeType}] ${event.ability.name} (${event.ability.guid})`)
+                            continue;
+                    }
                     break;
                 case 'cast':
                 default:
