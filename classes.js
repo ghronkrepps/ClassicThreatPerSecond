@@ -33,6 +33,15 @@ function handler_castCanMiss(threatValue, name) {
     }
 }
 
+function handler_modDamage(threatMod, name) {
+    return (player, event) => {
+        if (event.type == 'damage') {
+            return [event['amount']*threatMod, name];
+        }
+        return [0, name];
+    }
+}
+
 function handler_damage(name) {
     return (player, event) => {
         if (event.type == 'damage') {
@@ -200,9 +209,7 @@ class Warrior extends Player {
         20615: handler_zero("Intercept Stun"),         //Intercept Stun (Rank 3)
      
         //Execute
-        20647: (encounter, event) => {
-            return [event['amount'] * 1.25, "Execute"];
-        },
+        20647: handler_modDamage(1.25, "Execute"),
      
         /* Abilities */
         //Sunder Armor
@@ -310,6 +317,121 @@ class Warrior extends Player {
     }
 }
 
+
+class Druid extends Player {
+    classSpells = {
+        /* Forms */
+        9634: handler_changeThreatModifier(1.45, "Bear Form"),
+        768: handler_changeThreatModifier(0.71, "Cat Form"),
+
+        /* Bear */
+        6807: handler_modDamage(1.75, "Maul (Rank 1)"),
+        6808: handler_modDamage(1.75, "Maul (Rank 2)"),
+        6809: handler_modDamage(1.75, "Maul (Rank 3)"),
+        8972: handler_modDamage(1.75, "Maul (Rank 4)"),
+        9745: handler_modDamage(1.75, "Maul (Rank 5)"),
+        9880: handler_modDamage(1.75, "Maul (Rank 6)"),
+        9881: handler_modDamage(1.75, "Maul"),
+
+         779: handler_modDamage(1.75, "Swipe (Rank 1)"),
+         780: handler_modDamage(1.75, "Swipe (Rank 2)"),
+         769: handler_modDamage(1.75, "Swipe (Rank 3)"),
+        9754: handler_modDamage(1.75, "Swipe (Rank 4)"),
+        9908: handler_modDamage(1.75, "Swipe"),
+
+        6795: handler_zero("Growl"),
+        5229: handler_zero("Enrage"),
+        17057: handler_zero("Furor"),
+
+         8983: handler_zero("Bash"), //TODO test bash threat
+
+        /* Cat */
+         9850: handler_damage("Claw"),
+         9830: handler_damage("Shred"),
+         9904: handler_damage("Rake"),
+        22829: handler_damage("Ferocious Bite"),
+         9867: handler_damage("Ravage"),
+         9896: handler_damage("Rip"),
+         9827: handler_damage("Pounce"),
+         9913: handler_zero("Prowl"),
+         9846: handler_zero("Tiger's Fury"),
+
+         1850: handler_zero("Dash (Rank 1)"),
+         9821: handler_zero("Dash"),
+
+        /* Healing */
+        //TODO
+
+        /* Abilities */
+        17392: handler_threatOnDebuff(108, "Farie Fire (Feral)"),
+
+        16870: handler_zero("Clearcasting"),
+        29166: handler_zero("Innervate"),
+
+        22842: handler_zero("Frienzed Regeneration (Rank 1)"),
+        22895: handler_zero("Frienzed Regeneration (Rank 2)"),
+        22896: handler_zero("Frienzed Regeneration"),
+
+        24932: handler_zero("Leader of the Pack"),
+
+        /* Items */
+        13494: handler_zero("Manual Crowd Pummeler"),
+    } 
+
+    constructor(events) {
+        super(events);
+
+        // Identify the starting stance based on ability usage
+        let startStance = this.identify_start_stance(events);
+        switch (startStance) {
+            case 'Bear Form':
+                this.spell(9634)(this);
+                break;
+            case 'Cat Form':
+                this.spell(768)(this);
+                break;
+            default: //Human
+                this.threatModifier = 1.0;
+                break;
+        }
+        console.log(`Identified starting stance as '${startStance}' using modifier ${this.threatModifier}`);
+    }
+
+    identify_start_stance(events) {
+        for (let event of events) {
+            if (event.type == 'cast') {
+                switch (event.ability.name) {
+                    case 'Maul':
+                    case 'Swipe':
+                    case 'Demoralizing Roar':
+                    case 'Bash':
+                        return 'Bear Form';
+                    case 'Cower':
+                    case 'Ferocious Bite':
+                    case 'Rip':
+                    case 'Tiger\'s Fury':
+                    case 'Prowl':
+                    case 'Ravage':
+                    case 'Claw':
+                    case 'Dash':
+                        return 'Cat Form';
+                    case 'Healing Touch':
+                        return 'Human';
+                }
+            } else if (event.type == 'removebuff') {
+                switch (event.ability.guid) {
+                    case 9634:
+                        return 'Bear Form';
+                    case 768:
+                        return 'Cat Form';
+                }
+            }
+        }
+        return 'Unknown';
+    }
+}
+
 const gClasses = {
     "Warrior": Warrior,
+    "Druid": Druid,
 }

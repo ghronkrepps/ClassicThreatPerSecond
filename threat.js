@@ -116,7 +116,7 @@ class Encounter {
                     break;
                 case 'heal':
                     // Amount healed always in event.amount, overhealing in event.overheal
-                    t = event.amount / 2.0;
+                    t = (event.amount / 2.0) * this.player.threatModifier;
                     event_name = "Heal";
                     break;
                 case 'energize':
@@ -131,21 +131,19 @@ class Encounter {
                         console.log(`Unhandled ability ${event.ability.name} (${event.ability.guid})`)
                         continue;
                     }
-                    let threat_info = f(this.player, event);
-                    t = threat_info[0];
-                    event_name = threat_info[1];
+                    [t, event_name] = f(this.player, event);
+                    t *= this.player.threatModifier;
 
                     if (event.type == 'cast') {
                         this.cast_count[event_name] = (this.cast_count[event_name]||0)+1;
                     }
             }
-            // console.log(this.threat, t, event);
-            let adjusted_threat = t * this.player.threatModifier;
-            this.threat += adjusted_threat;
-
             if (t) {
-                this.breakdown[event_name] = (this.breakdown[event_name]||0)+adjusted_threat;
+                this.breakdown[event_name] = (this.breakdown[event_name]||0)+t;
             }
+
+            // console.log(this.threat, t, event);
+            this.threat += t;
         }
     }
 }
@@ -194,10 +192,10 @@ $( document ).ready(function() {
                 let pList = $('#playerList');
                 pList.empty();
                 for (player of p.friendlies) {
-                    if (player.type == "Warrior") {
+                    if (gClasses[player.type]) {
                         pList.append($('<option>', {
                             value: player.id,
-                            text: player.name,
+                            text: `[${player.type}] ${player.name}`,
                         }));
                     }
                 }
