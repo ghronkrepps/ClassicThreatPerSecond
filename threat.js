@@ -179,7 +179,7 @@ class Enemy {
 }
 
 
-$( document ).ready(function() {
+$(document).ready(function() {
     $("#reportForm").submit((event) => {
         gAPIKey = $("#api").val();
         let reportURL = $("#report").val();
@@ -224,14 +224,15 @@ $( document ).ready(function() {
     });
 
     $('#playerList').change((event) => {
-        let selected = $(this).find("option:selected");
-        let playerId = selected.val();
+        let selected = $('#playerList option:selected');
+        let playerID = selected.val();
         let playerName = selected.text();
+        // console.log(`Selected ${playerID} ${playerName}`);
 
 
         let savedFightID = $('#encounterList option:selected').val();
 
-        let encounters = gParse.getFriendlyEncounters(playerId);
+        let encounters = gParse.getFriendlyEncounters(playerID);
         let eList = $('#encounterList').empty();
         for (boss of encounters) {
             eList.append($('<option>', {
@@ -240,7 +241,7 @@ $( document ).ready(function() {
             }));
         }
 
-        let reselectEncounter = $(this).find(`option[value=${savedFightID}]`)
+        let reselectEncounter = $(`#encounterList option[value=${savedFightID}]`)
         if (reselectEncounter) {
             reselectEncounter.attr('selected','selected');
         }
