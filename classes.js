@@ -105,7 +105,7 @@ class Player {
         18833: handler_damage("Firebolt (Alcor's Proc)"),
 
         /* Thorn Effects */
-        9910: handler_damage("Thorns"),  //Thorns (Rank 6)
+         9910: handler_damage("Thorns"),  //Thorns (Rank 6)
         17275: handler_damage("Heart of the Scale"), //Heart of the Scale
         22600: handler_damage("Force Reactive Disk"), //Force Reactive
         11350: handler_zero("Oil of Immolation"),   //Oil of Immolation (buff)
@@ -158,8 +158,8 @@ class Warrior extends Player {
 
         /* Physical */
         12721: handler_damage("Deep Wounds"),
-         6552: handler_damage("Pummel (Rank 1)"), // (TODO: Did this interrupt)
-         6554: handler_damage("Pummel (Rank 2)"), // (TODO: Did this interrupt)
+         6552: handler_threatOnHit(60, "Pummel (Rank 1)"), //TODO: Verify these values ingame
+         6554: handler_threatOnHit(80, "Pummel (Rank 2)"),
         
         23881: handler_damage("Bloodthirst"), //Rank 1
         23892: handler_damage("Bloodthirst"), //Rank 2
@@ -266,59 +266,117 @@ class Warrior extends Player {
 
         // Identify the starting stance based on ability usage
         let startStance = this.identify_start_stance(events);
-        switch (startStance) {
-            case 'Defensive Stance':
-                this.spell(71)(this);
-                break;
-            case 'Battle Stance':
-                this.spell(2457)(this);
-                break;
-            case 'Berserker Stance':
-                this.spell(2458)(this);
-                break;
-            default:
-                throw "Failed to identify starting stance";
-        }
-        console.log(`Identified starting stance as '${startStance}' using modifier ${this.threatModifier}`);
+        if (startStance == 0)
+            throw "Failed to identify starting stance";
+        let [_, stanceName] = this.spell(startStance)(this);
+
+        console.log(`Identified starting stance as '${stanceName}' using modifier ${this.threatModifier}`);
     }
 
     identify_start_stance(events) {
+        let possibleStances = [71, 2457, 2458];
         for (let event of events) {
             if (event.sourceID != this.id)
                 continue;
             if (event.type == 'cast') {
-                switch (event.ability.name) {
-                    case 'Revenge':
-                    case 'Shield Slam':
-                    case 'Disarm':
-                    case 'Shield Wall':
-                    case 'Shield Block':
-                    case 'Taunt':
-                        return 'Defensive Stance';
-                    case 'Berserker Rage':
-                    case 'Intercept':
-                    case 'Recklessness':
-                    case 'Whirlwind':
-                        return 'Berserker Stance';
-                    case 'Charge':
-                    case 'Mocking Blow':
-                    case 'Overpower':
-                    case 'Retaliation':
-                    case 'Thunder Clap':
-                        return 'Battle Stance';
-                }
-            } else if (event.type == 'removebuff') {
                 switch (event.ability.guid) {
-                    case 71:
-                        return 'Defensive Stance';
-                    case 2457:
-                        return 'Battle Stance';
-                    case 2458:
-                        return 'Berserker Stance';
+                    //Overpower
+                    case 7384:
+                    case 7887:
+                    case 11584:
+                    case 11585:
+                    //Charge
+                    case 100:
+                    case 6178:
+                    case 11578:
+                    //Thunderclap
+                    case 6343:
+                    case 8198:
+                    case 8204:
+                    case 8205:
+                    case 11580:
+                    case 11581:
+                    //Mocking Blow
+                    case 694:
+                    case 7400:
+                    case 7402:
+                    case 20559:
+                    case 20560:
+                    //Retaliation
+                    case 20230:
+                    //Sweeping Strikes
+                    case 12292:
+                        return 2457; //Battle Stance
+
+                    //Intercept
+                    case 20252:
+                    case 20617:
+                    case 20616:
+                    //Whirlwind
+                    case 1680:
+                    //Berserker Rage
+                    case 18499:
+                    //Recklessness
+                    case 1719:
+                    //Pummel
+                    case 6552:
+                    case 6554:
+                        return 2458; //Berserker Stance
+
+                    //Taunt
+                    case 355:
+                    //Disarm
+                    case 676:
+                    //Revenge
+                    case 6572:
+                    case 6574:
+                    case 7379:
+                    case 11600:
+                    case 11601:
+                    case 25288:
+                    //Shield Block
+                    case 2565:
+                    //Shield Wall
+                    case 871:
+                        return 71; //Defensive Stance
+                    
+                    //Hamstring
+                    case 1715:
+                    case 7372:
+                    case 7373:
+                    //Execute
+                    case 5308:
+                    case 20658:
+                    case 20660:
+                    case 20661:
+                    case 20662:
+                        possibleStances.filter(s => s!=71)
+                        break;
+                    
+                    //Rend
+                    case 772:
+                    case 6546:
+                    case 6547:
+                    case 6548:
+                    case 11572:
+                    case 11573:
+                    case 11574:
+                    //Shield Bash
+                    case 72:
+                    case 1671:
+                    case 1672:
+                        possibleStances.filter(s => s!=2458)
+                        break;
+                }
+                if (possibleStances.length == 1)
+                    return possibleStances[0];
+            } else if (event.type == 'removebuff') {
+                if (possibleStances.includes(event.ability.guid)) {
+                    return event.ability.guid;
                 }
             }
         }
-        return 'Unknown';
+        return 0;
     }
 }
 
