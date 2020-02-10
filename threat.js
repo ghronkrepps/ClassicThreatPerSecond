@@ -2,7 +2,7 @@ var gAPIKey, gParse;
 
 
 function newParse(reportCode, callback) {
-    $.get(`https://classic.warcraftlogs.com:443/v1/report/fights/${reportCode}?translate=true&api_key=${gAPIKey}`, (data) => {
+    $.get(`https://classic.warcraftlogs.com:443/v1/report/fights/${reportCode}?api_key=${gAPIKey}`, (data) => {
         callback(new Parse(reportCode, data));
     }).fail((error) => {
         callback(undefined);
@@ -79,7 +79,6 @@ class Encounter {
             start: startTimestamp,
             end: this.stop,
             encounter: this.encounterID,
-            translate: true,
             api_key: gAPIKey,
         }), (data) => {
             this.events.push(...data['events']);
