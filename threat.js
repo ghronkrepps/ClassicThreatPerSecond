@@ -1,4 +1,5 @@
-var gAPIKey, gParse;
+//@discord [ResultsMayVary#8821]
+var gAPIKey="69092487a057f5673209290b97ac8d78", gParse;
 
 
 function newParse(reportCode, callback) {
@@ -180,12 +181,10 @@ class Enemy {
 
 $(document).ready(function() {
     $("#reportForm").submit((event) => {
-        gAPIKey = $("#api").val();
         let reportURL = $("#report").val();
-        console.log(gAPIKey, reportURL);
 
-        if (!gAPIKey || !reportURL) {
-            alert("Fill in the damn form");
+        if (!reportURL) {
+            alert("Enter your report URL");
         } else {
             let reportID = reportURL;
             try {
