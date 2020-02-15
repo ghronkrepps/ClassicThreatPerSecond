@@ -105,7 +105,8 @@ class Encounter {
         this.breakdown = {};
         this.cast_count = {};
         for (let event of this.events) {
-            if (event.sourceID != this.playerID)
+            //Ignore any events that we are not the source of (except energize we are not the target of)
+            if (event.sourceID != this.playerID && (event.type!='energize' || event.targetID != this.playerID))
                 continue;
 
             let t = 0;
