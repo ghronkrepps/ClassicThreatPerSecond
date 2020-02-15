@@ -105,8 +105,7 @@ class Encounter {
         this.breakdown = {};
         this.cast_count = {};
         for (let event of this.events) {
-            //Ignore any events that we are not the source of (except energize we are not the target of)
-            if (event.sourceID != this.playerID && (event.type!='energize' || event.targetID != this.playerID))
+            if (event.sourceID != this.playerID && event.targetID != this.playerID)
                 continue;
 
             let t = 0;
@@ -116,11 +115,15 @@ class Encounter {
                 case 'extraattacks':
                     break;
                 case 'heal':
+                    if (event.sourceID != this.playerID || !this.playerIDs.includes(event.targetID))
+                        continue;
                     // Amount healed always in event.amount, overhealing in event.overheal
                     t = (event.amount / 2.0) * this.player.threatModifier;
                     event_name = "Heal";
                     break;
                 case 'energize':
+                    if (event.targetID != this.playerID)
+                        continue
                     // resourceChange is always the full amount, have to subtract event.waste
                     switch (event.resourceChangeType) {
                         case 0:
@@ -142,6 +145,9 @@ class Encounter {
                         continue;
                 case 'cast':
                 default:
+                    if (event.sourceID != this.playerID)
+                        continue;
+
                     let f = this.player.spell(event.ability.guid);
                     if (f == undefined) {
                         console.log(`Unhandled ability ${event.ability.name} (${event.ability.guid})`)
