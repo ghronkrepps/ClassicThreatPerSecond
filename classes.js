@@ -103,14 +103,26 @@ class Player {
         24388: handler_damage("Brain Damage (Lobotomizer Proc)"),
         23267: handler_damage("Firebolt (Perdition's Proc)"),
         18833: handler_damage("Firebolt (Alcor's Proc)"),
-
+        
+        21992: (player, event) => {
+            switch (event.type) {
+                case 'applydebuff':
+                case 'refreshdebuff':
+                    return [90, "Thunderfury"];
+                case 'damage':
+                    return [event['amount'], "Thunderfury"];
+            }
+            return [0, "Thunderfury"];
+        },
+        27648: handler_threatOnDebuff(145, "Thunderfury"),
+        
         /* Thorn Effects */
          9910: handler_damage("Thorns"),  //Thorns (Rank 6)
         17275: handler_damage("Heart of the Scale"), //Heart of the Scale
         22600: handler_damage("Force Reactive Disk"), //Force Reactive
         11350: handler_zero("Oil of Immolation"),   //Oil of Immolation (buff)
         11351: handler_damage("Oil of Immolation"), //Oil of Immolation (dmg)
-    
+        
         /* Explosives */
         13241: handler_damage("Goblin Sapper Charge"), //Goblin Sapper Charge
     
