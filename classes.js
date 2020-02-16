@@ -271,7 +271,7 @@ class Warrior extends Player {
         /* Consumable */
          6613: handler_zero("Great Rage Potion"), //Great Rage Potion
         17528: handler_zero("Mighty Rage Potion"), //Mighty Rage Potion
-    } 
+    }
 
     constructor(playerID, events) {
         super(playerID, events);
@@ -439,12 +439,24 @@ class Druid extends Player {
 
          1850: handler_zero("Dash (Rank 1)"),
          9821: handler_zero("Dash"),
+         
+         8998: handler_castCanMiss(-240, "Cower (Rank 1)"),
+         9000: handler_castCanMiss(-390, "Cower (Rank 2)"),
+         9892: handler_castCanMiss(-600, "Cower"),
 
         /* Healing */
         //TODO
 
         /* Abilities */
-        17392: handler_threatOnDebuff(108, "Farie Fire (Feral)"),
+        16857: handler_threatOnDebuff(108, "Faerie Fire (Feral)(Rank 1)"),
+        17390: handler_threatOnDebuff(108, "Faerie Fire (Feral)(Rank 2)"),
+        17391: handler_threatOnDebuff(108, "Faerie Fire (Feral)(Rank 3)"),
+        17392: handler_threatOnDebuff(108, "Faerie Fire (Feral)"),
+        
+         770: handler_threatOnDebuff(108, "Faerie Fire (Rank 1)"),
+         778: handler_threatOnDebuff(108, "Faerie Fire (Rank 2)"),
+        9749: handler_threatOnDebuff(108, "Faerie Fire (Rank 3)"),
+        9907: handler_threatOnDebuff(108, "Faerie Fire"),
 
         16870: handler_zero("Clearcasting"),
         29166: handler_zero("Innervate"),
@@ -457,25 +469,24 @@ class Druid extends Player {
 
         /* Items */
         13494: handler_zero("Manual Crowd Pummeler"),
-    } 
+    }
 
     constructor(playerID, events) {
         super(playerID, events);
 
         // Identify the starting form based on ability usage
         let startForm = this.identify_start_form(events);
-        switch (startForm) {
-            case 'Bear Form':
-                this.spell(9634)(this);
-                break;
-            case 'Cat Form':
-                this.spell(768)(this);
-                break;
-            default: //Human
-                this.threatModifier = 1.0;
-                break;
+        
+        let _,stanceName
+        if (startForm == -1) {
+            stanceName = "Human"
+            self.threatModifier = 1.0
+            //throw "Failed to identify starting form";
+        } else {
+            [_, stanceName] = this.spell(startForm)(this);
         }
-        console.log(`Identified starting form as '${startForm}' using modifier ${this.threatModifier}`);
+        
+        console.log(`Identified starting form as '${stanceName}' using modifier ${this.threatModifier}`);
     }
 
     identify_start_form(events) {
@@ -483,34 +494,71 @@ class Druid extends Player {
             if (event.sourceID != this.id)
                 continue;
             if (event.type == 'cast') {
-                switch (event.ability.name) {
-                    case 'Maul':
-                    case 'Swipe':
-                    case 'Demoralizing Roar':
-                    case 'Bash':
-                        return 'Bear Form';
-                    case 'Cower':
-                    case 'Ferocious Bite':
-                    case 'Rip':
-                    case 'Tiger\'s Fury':
-                    case 'Prowl':
-                    case 'Ravage':
-                    case 'Claw':
-                    case 'Dash':
-                        return 'Cat Form';
-                    case 'Healing Touch':
-                        return 'Human';
+                switch (event.ability.guid) {
+                    //Maul
+                    case 6807:
+                    case 6808:
+                    case 6809:
+                    case 8972:
+                    case 9745:
+                    case 9880:
+                    case 9881:
+                    //Swipe
+                    case 779:
+                    case 780:
+                    case 769:
+                    case 9754:
+                    case 9908:
+                    //Demoralizing Roar
+                    case 99:
+                    case 1735:
+                    case 9490:
+                    case 9747:
+                    case 9898:
+                    //Growl
+                    case 6795:
+                    //Enrage
+                    case 5229:
+                    //Furor
+                    case 17057:
+                    //Bash
+                    case 8983:
+                        return 9634; //Bear Form
+
+                    //Claw
+                    case 9850:
+                    //Shred
+                    case 9830:
+                    //Rake
+                    case 9904:
+                    //Ferocious Bite
+                    case 22829:
+                    //Ravage
+                    case 9867:
+                    //Rip
+                    case 9896:
+                    //Pounce
+                    case 9827:
+                    //Prowl
+                    case 9913:
+                    //Tiger's Fury
+                    case 9846:
+                    //Dash`
+                    case 1850:
+                    case 9821:
+                        return 768; //Cat Form
+                        
+                    //TODO Healing spells
+                    case 0:
+                        return 0;
                 }
             } else if (event.type == 'removebuff') {
-                switch (event.ability.guid) {
-                    case 9634:
-                        return 'Bear Form';
-                    case 768:
-                        return 'Cat Form';
+                if ([9634, 768].includes(event.ability.guid)) {
+                    return event.ability.guid;
                 }
             }
         }
-        return 'Unknown';
+        return -1;
     }
 }
 
