@@ -279,7 +279,7 @@ class Warrior extends Player {
         // Identify the starting stance based on ability usage
         let startStance = this.identify_start_stance(events);
         if (startStance == 0)
-            throw "Failed to identify starting stance";
+            startStance=71;//throw "Failed to identify starting stance";
         let [_, stanceName] = this.spell(startStance)(this);
 
         console.log(`Identified starting stance as '${stanceName}' using modifier ${this.threatModifier}`);
