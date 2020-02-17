@@ -130,6 +130,10 @@ class Encounter {
                             t = (event.resourceChange - event.waste) * 5.0;
                             event_name = "Rage Gains";
                             break;
+                        case 3: //TODO: Unknown threat mod
+                            t = (event.resourceChange - event.waste) * 0;
+                            event_name = "Energy Gains";
+                            break;
                         default:
                             console.log(`Unhandled resource gain [${event.resourceChangeType}] ${event.ability.name} (${event.ability.guid})`)
                             continue;
@@ -154,12 +158,36 @@ class Encounter {
                     }
             }
             if (t) {
+                if (t < 0) { console.log(t, event); }
+
+                let batchTick = Math.round((event.timestamp - this.player.batchOffset) / 400);
+                // if (batchTick < 0) {
+                //     this.player.batchOffset += batchTick*400;
+                //     batchTick=0;
+                // }
+
+                console.log(batchTick, t, event);
+                let temp = this.player.batch[batchTick] || [];
+                temp.push([event_name, t]);
+                this.player.batch[batchTick] = temp;
+
                 this.breakdown[event_name] = (this.breakdown[event_name]||0)+t;
+                this.threat += t;
+            }
+        }
+
+        //Calculate batch event ticks for graphing
+        let totalThreat = 0;
+        for (var i = 0; i < this.player.batch.length+1; i++) {
+            let batchThreat = (this.player.batch[i]||[]);
+
+            for (event of batchThreat) {
+                totalThreat += event[1];
             }
 
-            // console.log(this.threat, t, event);
-            this.threat += t;
+            this.player.batch[i] = [batchThreat, totalThreat];
         }
+        console.log(this.player.batch);
     }
 }
 
@@ -261,6 +289,55 @@ $(document).ready(function() {
             results.append($('<div>', {text: `Total threat: ${e.threat.toFixed(0)}`}));
             results.append($('<div>', {text: `TPS: ${(e.threat / e.time).toFixed(2)}`}));
 
+            // Graph of threat over time
+            let graphSeries = [{
+                type: 'line',
+                name: 'Total Threat',
+                data: e.player.batch.map(x => x[1]),
+            }];
+
+            let graphAbilities = {};
+            for (i in e.player.batch) {
+                for (let event of e.player.batch[i][0]) {
+                    console.log(event[0], event[1])
+                    let ability = graphAbilities[event[0]];
+                    if (!ability)
+                        ability = new Array(e.player.batch.length).fill(0)
+                    ability[i] += event[1]
+                    graphAbilities[event[0]] = ability;
+                }
+            }
+
+            Object.keys(graphAbilities).forEach(function(abilityName) {
+                graphSeries.push({
+                    name: abilityName,
+                    data: graphAbilities[abilityName],
+                });
+            });
+            console.log(graphAbilities);
+
+
+            Highcharts.chart('graph', {
+                title: { text: 'Threat'},
+                chart: {
+                    type: 'area',
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'normal',
+                        lineColor: '#666666',
+                        lineWidth: 1,
+                        marker: {
+                            lineWidth: 1,
+                            lineColor: '#666666'
+                        }
+                    }
+                },
+                series: graphSeries,
+            });
+
+
+            // Table of threat abilities
             let entries = Object.entries(e.breakdown);
             entries.sort(function (a, b) {
                 return b[1] - a[1];
@@ -298,6 +375,8 @@ $(document).ready(function() {
                     return [ name, casts, cpm, abilityThreat, tps, percentage ];
                 }));
                 let table = new google.visualization.Table(document.getElementById("table"));
+                numberFormat.format(dataTable, 2);
+                numberFormat.format(dataTable, 3);
                 numberFormat.format(dataTable, 4);
                 percentFormat.format(dataTable, 5);
                 table.draw(dataTable);

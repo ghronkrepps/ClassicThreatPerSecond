@@ -5,19 +5,21 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://code.highcharts.com/highcharts.src.js"></script>
     <script src="classes.js"></script>
     <script src="threat.js"></script>
 </head>
 <body>
     <div class="infobox">
+        <center><a href="https://github.com/ResultsMayVary/ClassicThreatPerSecond"><h1>ResultsMayVary#8821 TPS Calc</h1></a></center>
         <form id="reportForm" action="#">
             <div>
                 <span><a href="https://classic.warcraftlogs.com/profile">WCL API Key</a>:</span>
-                <input id="api" value="">
+                <input id="api" value="69092487a057f5673209290b97ac8d78">
             </div>
             <div>
                 <span>Report url:</span>
-                <input id="report" placeholder="https://classic.warcraftlogs.com/reports/..." value="">
+                <input id="report" placeholder="https://classic.warcraftlogs.com/reports/..." value="https://classic.warcraftlogs.com/reports/yL4kdTFHxBCJ9RPw">
             </div>
             <input type="submit" value="Fetch Report">
         </form>
@@ -33,6 +35,7 @@
         </form>
     </div>
 
+    <div id="graph"></div>
     <div id="results"></div>
     <div id="table"></div>
 </body>

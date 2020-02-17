@@ -139,6 +139,23 @@ class Player {
     constructor(playerID, events) {
         this.id = playerID;
         this.threatModifier = 0.0;
+
+        this.batchOffset = 0;
+        this.batch = []
+        for (let e of events) {
+            if (e['sourceID'] == e['targetID'])
+                continue;
+            // console.log(e.timestamp/1000, e.type);
+
+            if (
+                (e.type == 'energize') ||
+                (e.type == 'damage' && e.hitType<=6)
+             ) {
+                console.log("First batch event:", e, e.timestamp/1000);
+                this.batchOffset = e.timestamp - 200;
+                break;
+            }
+        }
     }
 
     spell(id) {
