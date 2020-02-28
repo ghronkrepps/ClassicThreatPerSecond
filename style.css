@@ -22,6 +22,10 @@ select {
     font-size: large;
 }
 
+#fight-length-selector {
+    font-size: medium !important;
+}
+
 .infobox {
     background-color: gainsboro;
     padding: 10px;

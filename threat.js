@@ -53,21 +53,23 @@ class Encounter {
         this.stop = fight['end_time'];
         this.name = fight['name'];
         this.time = (this.stop - this.start) / 1000;
+        this.totalTime = (this.stop - this.start) / 1000;
 
         this.events = [];
         this.playerIDs = [];
+        this.eventBreakpoints = [];
     }
 
     // Adding a method to the constructor
-    parse(playerID, callback) {
+    parse(playerID, callback, endTimestamp) {
         this.playerID = playerID;
         if (this.playerIDs.includes(playerID)) {
-            this.calculate();
+            this.calculate(endTimestamp);
             callback(this);
         } else {
             this.playerIDs.push(playerID);
             this.fetch_events(() => {
-                this.calculate();
+                this.calculate(endTimestamp);
                 callback(this);
             });
         }
@@ -92,7 +94,7 @@ class Encounter {
         });
     }
 
-    calculate() {
+    calculate(endTimestamp) {
         let p = gParse.getPlayer(this.playerID);
         this.player = new gClasses[p.type](this.playerID, this.events);
 
@@ -104,9 +106,24 @@ class Encounter {
         this.threat = 0.0;
         this.breakdown = {};
         this.cast_count = {};
+        this.eventBreakpoints = [this.stop];
+        if (endTimestamp === undefined) {
+            endTimestamp = this.stop;
+        }
+
+        this.time = (endTimestamp - this.start) / 1000;
+
+        // Loop through for death events specifically, since we always want these no matter how the report is clipped.
+        this.events.filter(event => (event.sourceID == this.playerID || event.targetID == this.playerID) && event.type === 'death')
+            .forEach(event => this.eventBreakpoints.push(event.timestamp));
+
         for (let event of this.events) {
             if (event.sourceID != this.playerID && event.targetID != this.playerID)
                 continue;
+
+            if (event.timestamp > endTimestamp) {
+                break;
+            }
 
             let t = 0;
             let event_name = "";
@@ -167,6 +184,7 @@ class Encounter {
             // console.log(this.threat, t, event);
             this.threat += t;
         }
+        this.eventBreakpoints.sort();
     }
 }
 
@@ -255,6 +273,11 @@ $(document).ready(function() {
     });
 
     $("#parseForm").submit((event) => {
+        renderReport();
+        event.preventDefault();
+    });
+
+    function renderReport(timestamp) {
         let encounterID = $('#encounterList option:selected').val();
         let playerID = $('#playerList option:selected').val();
 
@@ -262,7 +285,27 @@ $(document).ready(function() {
         encounter.parse(playerID, (e) => {
             let playerName = $('#playerList option:selected').text();
             let results = $("#results").empty();
-            results.append($('<h1>', {text: `${playerName} - ${e.name} (${e.time.toFixed(2)})`}));
+            results.append($('<h1>', {text: `${playerName} - ${e.name} (${e.totalTime.toFixed(2)})`}));
+            if (timestamp === undefined) {
+                timestamp = e.stop;
+            }
+            if (e.eventBreakpoints.length > 1) {
+                // noinspection JSJQueryEfficiency
+                $("#fight-length-selector").remove("option");
+                results.append(`<div>Fight length: <select id="fight-length-selector">${e.eventBreakpoints.map(breakpointTime => {
+                    let endTime = (breakpointTime - e.start) / 1000;
+                    let isSelected = "";
+                    if (breakpointTime == timestamp) {
+                        isSelected = "selected";
+                    }
+                    return `<option value="${breakpointTime}" ${isSelected}>${endTime.toFixed(2)}</option>`;
+                })}</select> seconds</div>`)
+                // noinspection JSJQueryEfficiency
+                $("#fight-length-selector").change(() => {
+                    let endTimestamp = $("#fight-length-selector option:selected").val();
+                    renderReport(endTimestamp);
+                });
+            }
             results.append($('<div>', {text: `Total threat: ${e.threat.toFixed(0)}`}));
             results.append($('<div>', {text: `TPS: ${(e.threat / e.time).toFixed(2)}`}));
 
@@ -300,16 +343,15 @@ $(document).ready(function() {
                     } else {
                         casts = casts.toString()
                     }
-                    return [ name, casts, cpm, abilityThreat, tps, percentage ];
+                    return [name, casts, cpm, abilityThreat, tps, percentage];
                 }));
                 let table = new google.visualization.Table(document.getElementById("table"));
                 numberFormat.format(dataTable, 4);
                 percentFormat.format(dataTable, 5);
                 table.draw(dataTable);
             });
-        });
+        }, timestamp);
 
-        event.preventDefault();
         return false;
-    })
+    }
 });
