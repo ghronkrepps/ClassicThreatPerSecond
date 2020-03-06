@@ -239,6 +239,12 @@ class Warrior extends Player {
      
         //Mocking Blow
         20560: handler_damage("Mocking Blow"),
+     
+        //Overpower
+        11585: handler_damage("Overpower"),
+     
+        //Rend
+        11574: handler_damage("Rend"),
 
 
 

@@ -21,7 +21,7 @@ class Parse {
         this.enemies = report['enemies'];
 
         this.encounters = report['fights'].filter((fight) => {
-            return (fight['boss'] && fight['kill']);
+            return (fight['boss']);
         }).map((fight) => {
             return new Encounter(this.reportCode, fight);
         });
@@ -51,7 +51,7 @@ class Encounter {
         this.encounterID = fight['boss'];
         this.start = fight['start_time'];
         this.stop = fight['end_time'];
-        this.name = fight['name'];
+        this.name = fight['name'] + (fight['kill']?'':' [WIPE]');
         this.time = (this.stop - this.start) / 1000;
         this.totalTime = (this.stop - this.start) / 1000;
 
@@ -114,8 +114,8 @@ class Encounter {
         this.time = (endTimestamp - this.start) / 1000;
 
         // Loop through for death events specifically, since we always want these no matter how the report is clipped.
-        this.events.filter(event => (event.sourceID == this.playerID || event.targetID == this.playerID) && event.type === 'death')
-            .forEach(event => this.eventBreakpoints.push(event.timestamp));
+        let deathEvents = this.events.filter(event => (event.targetID == this.playerID && event.type === 'death'))
+        deathEvents.forEach(event => this.eventBreakpoints.push(event.timestamp));
 
         for (let event of this.events) {
             if (event.sourceID != this.playerID && event.targetID != this.playerID)
@@ -260,7 +260,7 @@ $(document).ready(function() {
         for (boss of encounters) {
             eList.append($('<option>', {
                 value: boss.id,
-                text: `${boss.name} (${boss.time.toFixed(2)})`,
+                text: `${boss.name} (${boss.totalTime.toFixed(2)})`,
             }));
         }
 
