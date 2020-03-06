@@ -277,8 +277,8 @@ $(document).ready(function() {
                 percentFormat = new google.visualization.NumberFormat({ fractionDigits: 2, suffix: "%" });
                 let dataTable = new google.visualization.DataTable();
                 dataTable.addColumn('string', "Source");
-                dataTable.addColumn('string', "Casts");
-                dataTable.addColumn('string', "CPM");
+                dataTable.addColumn('number', "Casts");
+                dataTable.addColumn('number', "CPM");
                 dataTable.addColumn('number', "Threat");
                 dataTable.addColumn('number', "TPS");
                 dataTable.addColumn('number', "Percent");
@@ -290,15 +290,13 @@ $(document).ready(function() {
                     let casts = e.cast_count[name];
                     let cpm = 60 * casts / e.time;
                     if (isNaN(cpm)) {
-                        cpm = "--";
+                        cpm = null;
                     } else {
-                        cpm = cpm.toFixed(1);
+                        cpm = parseFloat(cpm.toFixed(1));
                     }
 
                     if (isNaN(casts)) {
-                        casts = "--"
-                    } else {
-                        casts = casts.toString()
+                        casts = null;
                     }
                     return [ name, casts, cpm, abilityThreat, tps, percentage ];
                 }));
