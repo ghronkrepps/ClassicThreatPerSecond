@@ -578,7 +578,7 @@ class Warlock extends Player {
 		 17920: handler_modDamage(2.0, "Searing Pain (Rank 3)"),
 		 17921: handler_modDamage(2.0, "Searing Pain (Rank 4)"),
 		 17922: handler_modDamage(2.0, "Searing Pain (Rank 5)"),
-		 17923: handler_modDamage(2.0, "Searing Pain (Rank 6)"),
+		 17923: handler_modDamage(2.0, "Searing Pain"),
 		 
 		 686: handler_damage("Shadow Bolt (Rank 1)"),
 		 695: handler_damage("Shadow Bolt (Rank 2)"),
@@ -589,7 +589,7 @@ class Warlock extends Player {
 		 11659: handler_damage("Shadow Bolt (Rank 7)"),
 		 11660: handler_damage("Shadow Bolt (Rank 8)"),
 		 11661: handler_damage("Shadow Bolt (Rank 9)"),
-		 25307: handler_damage("Shadow Bolt (Rank 10)"),
+		 25307: handler_damage("Shadow Bolt"),
 		 
 		 348: handler_damage("Immolate (Rank 1)"),
 		 707: handler_damage("Immolate (Rank 1)"),
@@ -598,10 +598,10 @@ class Warlock extends Player {
 		 11665: handler_damage("Immolate (Rank 5)"),
 		 11667: handler_damage("Immolate (Rank 6)"),
 		 11668: handler_damage("Immolate (Rank 7)"),
-		 25309: handler_damage("Immolate (Rank 8)"),
+		 25309: handler_damage("Immolate"),
 		 
 		 6353: handler_damage("Soul Fire (Rank 1)"),
-		 17924: handler_damage("Soul Fire (Rank 2)"),
+		 17924: handler_damage("Soul Fire"),
     }
 
     constructor(playerID, events) {
