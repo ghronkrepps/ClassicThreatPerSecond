@@ -175,10 +175,9 @@ class Encounter {
                     [t, event_name] = f(this.player, event);
                     t *= this.player.threatModifier;
 
-					console.log(`Adding ${event.ability.name} (${event.ability.guid}) ${t}`)
-
                     if (event.type == 'cast') {
                         this.cast_count[event_name] = (this.cast_count[event_name]||0)+1;
+					console.log(`${this.cast_count[event_name]}`);
                     }
             }
             if (t) {
