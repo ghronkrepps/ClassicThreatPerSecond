@@ -160,6 +160,8 @@ class Encounter {
                     // Ignore self damage (e.g. sappers)
                     if (event.targetID == this.playerID)
                         continue;
+					
+					console.log(`Adding ${event.ability.name} (${event.amount}) ${t}`)
                 case 'cast':
                 default:
                     if (event.sourceID != this.playerID)
@@ -183,7 +185,7 @@ class Encounter {
                 this.breakdown[event_name] = (this.breakdown[event_name]||0)+t;
             }
 
-            // console.log(this.threat, t, event);
+            console.log(this.threat, t, event);
             this.threat += t;
         }
         this.eventBreakpoints.sort();
