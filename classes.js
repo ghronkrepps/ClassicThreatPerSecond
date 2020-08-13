@@ -398,7 +398,6 @@ class Warrior extends Player {
     }
 }
 
-
 class Druid extends Player {
 	
     classSpells = {
@@ -580,27 +579,27 @@ class Warlock extends Player {
 		 17922: handler_modDamage(2.0, "Searing Pain (Rank 5)"),
 		 17923: handler_modDamage(2.0, "Searing Pain"),
 		 
-		 686: handler_damage("Shadow Bolt (Rank 1)"),
-		 695: handler_damage("Shadow Bolt (Rank 2)"),
-		 705: handler_damage("Shadow Bolt (Rank 3)"),
-		 1088: handler_damage("Shadow Bolt (Rank 4)"),
-		 1106: handler_damage("Shadow Bolt (Rank 5)"),
-		 7641: handler_damage("Shadow Bolt (Rank 6)"),
-		 11659: handler_damage("Shadow Bolt (Rank 7)"),
-		 11660: handler_damage("Shadow Bolt (Rank 8)"),
-		 11661: handler_damage("Shadow Bolt (Rank 9)"),
+		 // 686: handler_damage("Shadow Bolt (Rank 1)"),
+		 // 695: handler_damage("Shadow Bolt (Rank 2)"),
+		 // 705: handler_damage("Shadow Bolt (Rank 3)"),
+		 // 1088: handler_damage("Shadow Bolt (Rank 4)"),
+		 // 1106: handler_damage("Shadow Bolt (Rank 5)"),
+		 // 7641: handler_damage("Shadow Bolt (Rank 6)"),
+		 // 11659: handler_damage("Shadow Bolt (Rank 7)"),
+		 // 11660: handler_damage("Shadow Bolt (Rank 8)"),
+		 // 11661: handler_damage("Shadow Bolt (Rank 9)"),
 		 25307: handler_damage("Shadow Bolt"),
 		 
-		 348: handler_damage("Immolate (Rank 1)"),
-		 707: handler_damage("Immolate (Rank 1)"),
-		 1094: handler_damage("Immolate (Rank 2)"),
-		 2941: handler_damage("Immolate (Rank 4)"),
-		 11665: handler_damage("Immolate (Rank 5)"),
-		 11667: handler_damage("Immolate (Rank 6)"),
-		 11668: handler_damage("Immolate (Rank 7)"),
+		 // 348: handler_damage("Immolate (Rank 1)"),
+		 // 707: handler_damage("Immolate (Rank 1)"),
+		 // 1094: handler_damage("Immolate (Rank 2)"),
+		 // 2941: handler_damage("Immolate (Rank 4)"),
+		 // 11665: handler_damage("Immolate (Rank 5)"),
+		 // 11667: handler_damage("Immolate (Rank 6)"),
+		 // 11668: handler_damage("Immolate (Rank 7)"),
 		 25309: handler_damage("Immolate"),
 		 
-		 6353: handler_damage("Soul Fire (Rank 1)"),
+		 // 6353: handler_damage("Soul Fire (Rank 1)"),
 		 17924: handler_damage("Soul Fire"),
     }
 
