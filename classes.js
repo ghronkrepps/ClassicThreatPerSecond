@@ -400,6 +400,7 @@ class Warrior extends Player {
 
 
 class Druid extends Player {
+	
     classSpells = {
         /* Forms */
         9634: handler_changeThreatModifier(1.45, "Bear Form"),
@@ -568,7 +569,46 @@ class Druid extends Player {
     }
 }
 
+class Warlock extends Player {
+	
+    classSpells = {
+
+         5676: handler_modDamage(2.0, "Searing Pain (Rank 1)"),
+		 17919: handler_modDamage(2.0, "Searing Pain (Rank 2)"),
+		 17920: handler_modDamage(2.0, "Searing Pain (Rank 3)"),
+		 17921: handler_modDamage(2.0, "Searing Pain (Rank 4)"),
+		 17922: handler_modDamage(2.0, "Searing Pain (Rank 5)"),
+		 17923: handler_modDamage(2.0, "Searing Pain (Rank 6)"),
+		 
+		 686: handler_damage("Shadow Bolt (Rank 1)"),
+		 695: handler_damage("Shadow Bolt (Rank 2)"),
+		 705: handler_damage("Shadow Bolt (Rank 3)"),
+		 1088: handler_damage("Shadow Bolt (Rank 4)"),
+		 1106: handler_damage("Shadow Bolt (Rank 5)"),
+		 7641: handler_damage("Shadow Bolt (Rank 6)"),
+		 11659: handler_damage("Shadow Bolt (Rank 7)"),
+		 11660: handler_damage("Shadow Bolt (Rank 8)"),
+		 11661: handler_damage("Shadow Bolt (Rank 9)"),
+		 25307: handler_damage("Shadow Bolt (Rank 10)"),
+		 
+		 348: handler_damage("Immolate (Rank 1)"),
+		 707: handler_damage("Immolate (Rank 1)"),
+		 1094: handler_damage("Immolate (Rank 2)"),
+		 2941: handler_damage("Immolate (Rank 4)"),
+		 11665: handler_damage("Immolate (Rank 5)"),
+		 11667: handler_damage("Immolate (Rank 6)"),
+		 11668: handler_damage("Immolate (Rank 7)"),
+		 25309: handler_damage("Immolate (Rank 8)"),
+    }
+
+    constructor(playerID, events) {
+        super(playerID, events);
+
+    }
+}
+
 const gClasses = {
     "Warrior": Warrior,
     "Druid": Druid,
+	"Warlock": Warlock,
 }
