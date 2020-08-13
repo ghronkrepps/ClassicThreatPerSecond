@@ -599,6 +599,9 @@ class Warlock extends Player {
 		 11667: handler_damage("Immolate (Rank 6)"),
 		 11668: handler_damage("Immolate (Rank 7)"),
 		 25309: handler_damage("Immolate (Rank 8)"),
+		 
+		 6353: handler_damage("Soul Fire (Rank 1)"),
+		 17924: handler_damage("Soul Fire (Rank 2)"),
     }
 
     constructor(playerID, events) {
