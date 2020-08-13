@@ -607,6 +607,7 @@ class Warlock extends Player {
     constructor(playerID, events) {
         super(playerID, events);
 
+		self.threatModifier = 1.0;
     }
 }
 
