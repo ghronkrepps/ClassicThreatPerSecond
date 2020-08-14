@@ -181,7 +181,7 @@ class Encounter {
             }
             if (t) {				
                 this.breakdown[event_name] = (this.breakdown[event_name]||0)+t;
-				console.log(`breakdown ${this.breakdown[event_name]}`)
+				console.log(`breakdown: ${event_name} - ${this.breakdown[event_name]}`)
             }
 
             console.log(this.threat, t, event);
