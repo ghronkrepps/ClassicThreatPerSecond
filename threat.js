@@ -161,7 +161,7 @@ class Encounter {
                     if (event.targetID == this.playerID)
                         continue;
 					
-					console.log(`Adding ${event.ability.name} (${event.amount}) ${t}`)
+					//console.log(`Adding ${event.ability.name} (${event.amount}) ${t}`)
                 case 'cast':
                 default:
                     if (event.sourceID != this.playerID)
@@ -174,6 +174,8 @@ class Encounter {
                     }
                     [t, event_name] = f(this.player, event);
                     t *= this.player.threatModifier;
+					
+					console.log(`Thread modifier: ${this.player.threatModifier}`)
 
                     if (event.type == 'cast') {
                         this.cast_count[event_name] = (this.cast_count[event_name]||0)+1;
