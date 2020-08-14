@@ -174,16 +174,14 @@ class Encounter {
                     }
                     [t, event_name] = f(this.player, event);
                     t *= this.player.threatModifier;
-					
-					console.log(`Thread modifier: ${this.player.threatModifier}`)
 
                     if (event.type == 'cast') {
                         this.cast_count[event_name] = (this.cast_count[event_name]||0)+1;
-					console.log(`${this.cast_count[event_name]}`);
                     }
             }
-            if (t) {
+            if (t) {				
                 this.breakdown[event_name] = (this.breakdown[event_name]||0)+t;
+				console.log(`breakdown ${this.breakdown[event_name]}`)
             }
 
             console.log(this.threat, t, event);
